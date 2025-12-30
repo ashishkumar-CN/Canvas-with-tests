@@ -1,31 +1,48 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import Layout from "@/components/Layout";
 import { products } from "@/data/products";
-import  {ProductCard}  from "@/components/ProductCard";
 
-const CategoryProduct = () => {
-  const { category } = useParams<{ category: string }>();
+const CategoryProducts = () => {
+  const { slug } = useParams();
 
   const filteredProducts = products.filter(
-    (product) => product.category === category
+    p => p.categorySlug === slug
   );
 
   return (
-    <div className="px-6 py-10">
-      <h1 className="text-3xl font-bold capitalize mb-8">
-        {category} Products
-      </h1>
+    <Layout>
+      <div className="container py-10">
+        <h1 className="text-2xl font-bold mb-6 capitalize">
+          {slug?.replace("-", " ")}
+        </h1>
 
-      {filteredProducts.length === 0 ? (
-        <p className="text-gray-500">No products found in this category.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
-    </div>
+        {filteredProducts.length === 0 ? (
+          <p>No products found.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {filteredProducts.map(product => (
+              <Link
+                key={product.id}
+                to={`/product/${product.id}`}
+                className="block"
+              >
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <h3 className="mt-2 font-medium">{product.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  ₹{product.price}
+                </p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </Layout>
   );
 };
 
-export default CategoryProduct;
+export default CategoryProducts;
+

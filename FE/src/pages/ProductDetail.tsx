@@ -1,62 +1,85 @@
-import { useParams } from 'react-router-dom';
-import Layout from '@/components/Layout';
-import { getProductById } from '@/data/products';
-import { Star } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
+import { toast } from 'sonner';
+import { ShoppingCart, Zap } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Button } from '@/components/ui/button';
 
-const ProductDetails = () => {
+const ProductDetail = () => {
+  // ... imports and basic state ...
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { product, loading } = useSelector((state: any) => state.product);
+  const { addToCart } = useCart(); // Destructure addToCart
 
-  const product = id ? getProductById(id) : null;
+  // ... useEffect ...
 
-  if (!product) {
-    return (
-      <Layout>
-        <div className="container py-20 text-center">
-          <h2 className="text-2xl font-semibold">Product not found</h2>
-        </div>
-      </Layout>
-    );
+  const handleAddToCart = async () => {
+    if (!product) return;
+    await addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.discount ? product.price / (1 - product.discount / 100) : product.price,
+      image: product.image || product.imageUrl,
+      category: product.category?.name || 'Category'
+    });
+    toast.success("Added to Cart", {
+      description: `${product.name} has been added to your cart.`,
+      action: {
+        label: 'View Cart',
+        onClick: () => navigate('/cart')
+      }
+    });
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    navigate('/cart');
+  };
+
+  if (loading || !product) {
+    // ... loading state ...
   }
 
   return (
-    <Layout>
-      <div className="container py-12 grid md:grid-cols-2 gap-10">
-        {/* IMAGE */}
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full rounded-lg"
-        />
-
-        {/* DETAILS */}
-        <div>
-          <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-
-          <div className="flex items-center gap-1 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`h-4 w-4 ${
-                  i < Math.floor(product.rating)
-                    ? 'text-primary fill-primary'
-                    : 'text-muted'
-                }`}
-              />
-            ))}
-            <span className="ml-2 text-sm">({product.rating})</span>
-          </div>
-
-          <p className="text-muted-foreground mb-4">
-            {product.description}
-          </p>
-
+    // ... Layout ...
+    // ... Image ...
+    <div className="flex-1 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold font-display">{product.name}</h1>
+        <div className="flex items-center gap-4 mt-2">
           <p className="text-2xl font-bold text-primary">
             ₹{product.price.toLocaleString()}
           </p>
+          {product.discount > 0 && (
+            <span className="text-sm text-muted-foreground line-through">
+              ₹{product.price + product.discount} {/* Or correct calculation */}
+            </span>
+          )}
         </div>
       </div>
-    </Layout>
+
+      <p className="text-muted-foreground leading-relaxed">
+        {product.description}
+      </p>
+
+      <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border">
+        <Button size="lg" className="btn-gold flex-1 gap-2" onClick={handleAddToCart}>
+          <ShoppingCart className="h-5 w-5" />
+          Add to Cart
+        </Button>
+        <Button size="lg" variant="outline" className="flex-1 gap-2 border-primary text-primary hover:bg-primary/10" onClick={handleBuyNow}>
+          <Zap className="h-5 w-5" />
+          Buy Now
+        </Button>
+      </div>
+
+      {/* Additional Info / Trust Badges could go here */}
+    </div>
+    // ...
   );
 };
 
-export default ProductDetails;
+export default ProductDetail;

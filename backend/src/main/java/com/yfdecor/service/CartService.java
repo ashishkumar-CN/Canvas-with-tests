@@ -2,6 +2,7 @@
 package com.yfdecor.service;
 
 import com.yfdecor.dto.request.CartItemRequest;
+import com.yfdecor.dto.response.AdminCartItemResponse;
 import com.yfdecor.dto.response.CartItemResponse;
 import com.yfdecor.dto.response.ProductResponse;
 import com.yfdecor.model.CartItem;
@@ -28,8 +29,8 @@ public class CartService {
 	private final ProductRepository productRepository;
 
 	/* ===================== GET CART ===================== */
-	public List<CartItemResponse> getCart(Long id) {
-		return cartItemRepository.findById(id)
+	public List<CartItemResponse> getCart(User user) {
+		return cartItemRepository.findByUser(user)
 				.stream()
 				.map(this::toResponse)
 				.collect(Collectors.toList());
@@ -143,12 +144,41 @@ public class CartService {
 		}
 	}
 
+	/* ===================== ADMIN: GET ALL CARTS ===================== */
+	public List<AdminCartItemResponse> getAllCartItems() {
+		return cartItemRepository.findAll().stream()
+				.map(this::toAdminResponse)
+				.collect(Collectors.toList());
+	}
+
 	/* ===================== MAPPER ===================== */
 	private CartItemResponse toResponse(CartItem item) {
 		Product p = item.getProduct();
 
 		return CartItemResponse.builder()
 				.id(item.getId())
+				.quantity(item.getQuantity())
+				.product(ProductResponse.builder()
+						.id(p.getId())
+						.name(p.getName())
+						.slug(p.getSlug())
+						.description(p.getDescription())
+						.imageUrl(p.getImageUrl())
+						.stock(p.getStock())
+						.price(p.getPrice())
+						.discount(p.getDiscount())
+						.build())
+				.build();
+	}
+
+	private AdminCartItemResponse toAdminResponse(CartItem item) {
+		Product p = item.getProduct();
+		User u = item.getUser();
+
+		return AdminCartItemResponse.builder()
+				.id(item.getId())
+				.userName(u.getName())
+				.userEmail(u.getEmail())
 				.quantity(item.getQuantity())
 				.product(ProductResponse.builder()
 						.id(p.getId())

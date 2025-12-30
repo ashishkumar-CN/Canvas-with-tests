@@ -18,6 +18,8 @@ public class Profile {
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
 	private User user;
 
 	private String phone;

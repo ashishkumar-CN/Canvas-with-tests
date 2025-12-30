@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from "@/config/api";
 import {
   FETCH_CART_REQUEST,
   FETCH_CART_SUCCESS,
@@ -21,29 +21,25 @@ import {
   CLEAR_CART_LOCAL
 } from './actiontype';
 
-// API base URL - adjust as needed
-const API_BASE_URL = 'http://localhost:8080/api/cart';
-
-// Helper to get auth token - adjust based on your auth implementation
-const getAuthToken = () => {
-  return localStorage.getItem('token'); // or however you store the token
-};
-
-// Helper to get user ID - adjust based on your auth implementation
-const getUserId = () => {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  return user.id;
-};
 
 // Async Actions
 export const fetchCart = () => async (dispatch) => {
   dispatch({ type: FETCH_CART_REQUEST });
   try {
-    const userId = getUserId();
-    const token = getAuthToken();
-    const response = await axios.get(`${API_BASE_URL}/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    // userId is not needed in URL if token is present, but backend requires it.
+    // We assume backend handles security via token, but path still needs ID.
+    // For now, let's keep using getUserId() helper or update backend to use Principal.
+    // The previous code had getUserId(). Let's keep it but use api instance.
+    const userStr = localStorage.getItem('user');
+    const userId = userStr ? JSON.parse(userStr).id : null;
+
+    if (!userId) {
+      console.warn("User not logged in, skipping cart fetch");
+      dispatch({ type: FETCH_CART_FAILURE, payload: "User not logged in" });
+      return;
+    }
+
+    const response = await api.get(`/cart/${userId}`);
     const cartItems = response.data.map(item => ({
       id: item.id.toString(),
       name: item.product.name,
@@ -51,7 +47,7 @@ export const fetchCart = () => async (dispatch) => {
       originalPrice: item.product.discount ? item.product.price : undefined,
       image: item.product.imageUrl,
       quantity: item.quantity,
-      category: item.product.category || 'General' // Assuming category is available
+      category: item.product.category || 'General'
     }));
     dispatch({ type: FETCH_CART_SUCCESS, payload: cartItems });
   } catch (error) {
@@ -62,13 +58,16 @@ export const fetchCart = () => async (dispatch) => {
 export const addToCart = (productId, quantity = 1) => async (dispatch) => {
   dispatch({ type: ADD_TO_CART_REQUEST });
   try {
-    const userId = getUserId();
-    const token = getAuthToken();
-    const response = await axios.post(`${API_BASE_URL}/${userId}`, {
+    const userStr = localStorage.getItem('user');
+    const userId = userStr ? JSON.parse(userStr).id : null;
+
+    if (!userId) {
+      throw new Error("Please login to add items to cart");
+    }
+
+    const response = await api.post(`/cart/${userId}`, {
       productId,
       quantity
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
     });
     const item = response.data;
     const cartItem = {
@@ -89,12 +88,9 @@ export const addToCart = (productId, quantity = 1) => async (dispatch) => {
 export const updateCartItem = (cartItemId, quantity) => async (dispatch) => {
   dispatch({ type: UPDATE_CART_ITEM_REQUEST });
   try {
-    const userId = getUserId();
-    const token = getAuthToken();
-    const response = await axios.put(`${API_BASE_URL}/${userId}/${cartItemId}`, {
+    const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
+    const response = await api.put(`/cart/${userId}/${cartItemId}`, {
       quantity
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
     });
     const item = response.data;
     const cartItem = {
@@ -115,11 +111,8 @@ export const updateCartItem = (cartItemId, quantity) => async (dispatch) => {
 export const removeCartItem = (cartItemId) => async (dispatch) => {
   dispatch({ type: REMOVE_CART_ITEM_REQUEST });
   try {
-    const userId = getUserId();
-    const token = getAuthToken();
-    await axios.delete(`${API_BASE_URL}/${userId}/${cartItemId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
+    await api.delete(`/cart/${userId}/${cartItemId}`);
     dispatch({ type: REMOVE_CART_ITEM_SUCCESS, payload: cartItemId.toString() });
   } catch (error) {
     dispatch({ type: REMOVE_CART_ITEM_FAILURE, payload: error.message });
@@ -129,11 +122,8 @@ export const removeCartItem = (cartItemId) => async (dispatch) => {
 export const clearCart = () => async (dispatch) => {
   dispatch({ type: CLEAR_CART_REQUEST });
   try {
-    const userId = getUserId();
-    const token = getAuthToken();
-    await axios.delete(`${API_BASE_URL}/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
+    await api.delete(`/cart/${userId}`);
     dispatch({ type: CLEAR_CART_SUCCESS });
   } catch (error) {
     dispatch({ type: CLEAR_CART_FAILURE, payload: error.message });

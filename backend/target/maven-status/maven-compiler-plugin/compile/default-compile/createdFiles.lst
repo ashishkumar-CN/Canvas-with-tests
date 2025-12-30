@@ -31,6 +31,7 @@ com\yfdecor\DecorApplication.class
 com\yfdecor\repository\AddressRepository.class
 com\yfdecor\dto\request\CartItemRequest.class
 com\yfdecor\model\Order$OrderBuilder.class
+com\yfdecor\dto\response\AdminCartItemResponse$AdminCartItemResponseBuilder.class
 com\yfdecor\model\Address$AddressBuilder.class
 com\yfdecor\model\CartItem.class
 com\yfdecor\model\Order.class
@@ -40,6 +41,7 @@ com\yfdecor\dto\response\ProductResponse$ProductResponseBuilder.class
 com\yfdecor\controller\AddressController.class
 com\yfdecor\dto\response\OrderItemResponse$OrderItemResponseBuilder.class
 com\yfdecor\config\SecurityConfig.class
+com\yfdecor\dto\response\AdminCartItemResponse.class
 com\yfdecor\dto\response\OrderItemResponse.class
 com\yfdecor\controller\OrderController.class
 com\yfdecor\dto\response\ProfileResponse.class
@@ -49,6 +51,7 @@ com\yfdecor\repository\ProductRepository.class
 com\yfdecor\repository\WishlistRepository.class
 com\yfdecor\dto\response\UserResponse$UserResponseBuilder.class
 com\yfdecor\dto\request\OrderRequest.class
+com\yfdecor\controller\AdminOrderController.class
 com\yfdecor\dto\response\CartItemResponse$CartItemResponseBuilder.class
 com\yfdecor\model\Profile$ProfileBuilder.class
 com\yfdecor\model\User.class
@@ -60,13 +63,16 @@ com\yfdecor\dto\request\ProfileUpdateRequest.class
 com\yfdecor\service\OrderService.class
 com\yfdecor\model\Product.class
 com\yfdecor\service\CartService.class
+com\yfdecor\config\DataSeeder.class
 com\yfdecor\dto\response\UserResponse.class
 com\yfdecor\repository\CategoryRepository.class
+com\yfdecor\model\OrderStatus.class
 com\yfdecor\dto\response\CategoryResponse.class
 com\yfdecor\repository\ProfileRepository.class
 com\yfdecor\dto\request\AddressRequest.class
 com\yfdecor\dto\response\AddressResponse.class
 com\yfdecor\service\ProductService.class
+com\yfdecor\controller\AdminCartController.class
 com\yfdecor\dto\request\RegisterRequest.class
 com\yfdecor\model\Profile.class
 com\yfdecor\model\OrderItem.class

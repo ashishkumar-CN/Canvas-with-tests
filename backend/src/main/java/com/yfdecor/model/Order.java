@@ -31,8 +31,9 @@ public class Order {
 	@Column(nullable = false)
 	private Double deliveryCharge;
 
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private String status; // pending, confirmed, shipped, delivered
+	private OrderStatus status;
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;

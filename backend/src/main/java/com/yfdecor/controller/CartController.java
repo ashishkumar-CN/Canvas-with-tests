@@ -28,7 +28,7 @@ public class CartController {
 				.orElseThrow(() -> new ResponseStatusException(
 						HttpStatus.NOT_FOUND, "User not found"));
 
-		return ResponseEntity.ok(cartService.getCart(userId));
+		return ResponseEntity.ok(cartService.getCart(user));
 	}
 
 	@PostMapping("/{userId}")

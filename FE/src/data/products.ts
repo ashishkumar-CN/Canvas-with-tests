@@ -1,10 +1,17 @@
-import canvasBuddha from '@/assets/products/canvas-buddha.jpg';
-import crystalButterfly from '@/assets/products/crystal-butterfly.jpg';
-import gearClock from '@/assets/products/gear-clock.jpg';
-import tropicalWallpaper from '@/assets/products/tropical-wallpaper.jpg';
+import canvasBuddha from '@/assets/products/horses-painting.jpg';
+import crystalButterfly from '@/assets/products/flowerPot.jpeg';
+import gearClock from '@/assets/products/rangloi.jpeg';
+import tropicalWallpaper from '@/assets/products/peacock.jpeg';
 import horsesPainting from '@/assets/products/horses-painting.jpg';
-import radhaKrishna from '@/assets/products/radha-krishna.jpg';
+import radhaKrishna from '@/assets/products/flower.jpeg';
 import abstractArt from '@/assets/products/abstract-art.jpg';
+
+import mandala from '@/assets/products/DoorBug.jpeg';
+import lotus from '@/assets/products/radha.jpeg';
+import ganesha from '@/assets/products/bhgwan.jpeg';
+import modernClock from '@/assets/products/rangoli2.jpeg';
+import floralWallpaper from '@/assets/products/taz.jpeg';
+import peacockArt from '@/assets/products/dear.jpeg';
 
 export interface Product {
   id: string;
@@ -72,7 +79,7 @@ export const products: Product[] = [
     image: canvasBuddha,
     category: 'Canvas Paintings',
     categorySlug: 'canvas-paintings',
-    description: 'Beautiful Buddha canvas painting with lotus flowers, perfect for meditation rooms and living spaces.',
+    description: 'Beautiful Buddha canvas painting with lotus flowers.',
     rating: 4.8,
     inStock: true
   },
@@ -84,7 +91,7 @@ export const products: Product[] = [
     image: crystalButterfly,
     category: 'Crystal Glass Paintings',
     categorySlug: 'crystal-paintings',
-    description: 'Stunning crystal glass artwork featuring golden butterfly with sparkling accents.',
+    description: 'Stunning crystal glass artwork.',
     rating: 4.9,
     inStock: true
   },
@@ -96,7 +103,7 @@ export const products: Product[] = [
     image: gearClock,
     category: 'Moving Gear Clocks',
     categorySlug: 'gear-clocks',
-    description: 'Steampunk style wall clock with visible moving gears, antique bronze finish.',
+    description: 'Steampunk style wall clock.',
     rating: 4.7,
     inStock: true
   },
@@ -108,7 +115,7 @@ export const products: Product[] = [
     image: tropicalWallpaper,
     category: 'Premium Wallpapers',
     categorySlug: 'wallpapers',
-    description: 'Vibrant tropical wallpaper with lush palm leaves and exotic flowers.',
+    description: 'Vibrant tropical wallpaper.',
     rating: 4.6,
     inStock: true
   },
@@ -120,7 +127,7 @@ export const products: Product[] = [
     image: horsesPainting,
     category: 'Canvas Paintings',
     categorySlug: 'canvas-paintings',
-    description: 'Dynamic canvas painting of seven galloping horses, brings positive energy and success.',
+    description: 'Seven galloping horses canvas art.',
     rating: 4.8,
     inStock: true
   },
@@ -132,7 +139,7 @@ export const products: Product[] = [
     image: radhaKrishna,
     category: 'Canvas Paintings',
     categorySlug: 'canvas-paintings',
-    description: 'Traditional Radha Krishna painting with vibrant colors and lotus flowers.',
+    description: 'Radha Krishna traditional artwork.',
     rating: 4.9,
     inStock: true
   },
@@ -144,20 +151,90 @@ export const products: Product[] = [
     image: abstractArt,
     category: 'Canvas Paintings',
     categorySlug: 'canvas-paintings',
-    description: 'Contemporary abstract artwork with bold gold and teal brush strokes.',
+    description: 'Modern abstract artwork.',
     rating: 4.5,
+    inStock: true
+  },
+  {
+    id: 'p8',
+    name: 'Colorful Mandala Canvas Art',
+    price: 2899,
+    originalPrice: 5499,
+    image: mandala,
+    category: 'Canvas Paintings',
+    categorySlug: 'canvas-paintings',
+    description: 'Mandala artwork symbolizing harmony.',
+    rating: 4.7,
+    inStock: true
+  },
+  {
+    id: 'p9',
+    name: 'Lotus Serenity Canvas',
+    price: 2599,
+    originalPrice: 4999,
+    image: lotus,
+    category: 'Canvas Paintings',
+    categorySlug: 'canvas-paintings',
+    description: 'Lotus themed peaceful artwork.',
+    rating: 4.8,
+    inStock: true
+  },
+  {
+    id: 'p10',
+    name: 'Ganesha Blessings Artwork',
+    price: 3199,
+    originalPrice: 5999,
+    image: ganesha,
+    category: 'Canvas Paintings',
+    categorySlug: 'canvas-paintings',
+    description: 'Lord Ganesha divine painting.',
+    rating: 4.9,
+    inStock: true
+  },
+  {
+    id: 'p11',
+    name: 'Modern Industrial Gear Clock',
+    price: 5599,
+    originalPrice: 8999,
+    image: modernClock,
+    category: 'Moving Gear Clocks',
+    categorySlug: 'gear-clocks',
+    description: 'Industrial style gear clock.',
+    rating: 4.6,
+    inStock: true
+  },
+  {
+    id: 'p12',
+    name: 'Luxury Floral Wallpaper',
+    price: 1499,
+    originalPrice: 2999,
+    image: floralWallpaper,
+    category: 'Premium Wallpapers',
+    categorySlug: 'wallpapers',
+    description: 'Elegant floral wallpaper.',
+    rating: 4.5,
+    inStock: true
+  },
+  {
+    id: 'p13',
+    name: 'Royal Peacock Canvas Art',
+    price: 3399,
+    originalPrice: 6499,
+    image: peacockArt,
+    category: 'Canvas Paintings',
+    categorySlug: 'canvas-paintings',
+    description: 'Royal peacock artwork.',
+    rating: 4.8,
     inStock: true
   }
 ];
 
-export const getProductsByCategory = (categorySlug: string): Product[] => {
-  return products.filter(p => p.categorySlug === categorySlug);
-};
+export const getProductsByCategory = (categorySlug: string): Product[] =>
+  products.filter(p => p.categorySlug === categorySlug);
 
-export const getProductById = (id: string): Product | undefined => {
-  return products.find(p => p.id === id);
-};
+export const getProductById = (id: string): Product | undefined =>
+  products.find(p => p.id === id);
 
-export const getCategoryBySlug = (slug: string): Category | undefined => {
-  return categories.find(c => c.slug === slug);
-};
+export const getCategoryBySlug = (slug: string): Category | undefined =>
+  categories.find(c => c.slug === slug);
+

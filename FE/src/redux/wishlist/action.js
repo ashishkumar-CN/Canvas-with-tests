@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from "@/config/api";
 import {
   FETCH_WISHLIST_REQUEST,
   FETCH_WISHLIST_SUCCESS,
@@ -64,15 +64,10 @@ export const fetchWishlist = () => {
   return async (dispatch) => {
     dispatch(fetchWishlistRequest());
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/wishlist', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await api.get('/wishlist');
       dispatch(fetchWishlistSuccess(response.data));
     } catch (error) {
-      dispatch(fetchWishlistFailure(error.response?.data?.message || error.message));
+      dispatch(fetchWishlistFailure(error.message));
     }
   };
 };
@@ -81,15 +76,10 @@ export const addToWishlist = (productId) => {
   return async (dispatch) => {
     dispatch(addToWishlistRequest());
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(`http://localhost:8080/api/wishlist/${productId}`, {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await api.post(`/wishlist/${productId}`);
       dispatch(addToWishlistSuccess(response.data));
     } catch (error) {
-      dispatch(addToWishlistFailure(error.response?.data?.message || error.message));
+      dispatch(addToWishlistFailure(error.message));
     }
   };
 };
@@ -98,15 +88,10 @@ export const removeFromWishlist = (productId) => {
   return async (dispatch) => {
     dispatch(removeFromWishlistRequest());
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:8080/api/wishlist/${productId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      await api.delete(`/wishlist/${productId}`);
       dispatch(removeFromWishlistSuccess(productId));
     } catch (error) {
-      dispatch(removeFromWishlistFailure(error.response?.data?.message || error.message));
+      dispatch(removeFromWishlistFailure(error.message));
     }
   };
 };

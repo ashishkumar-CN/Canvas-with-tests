@@ -1,7 +1,6 @@
 import React, { createContext, useContext, ReactNode, useEffect } from 'react';
-import { useSelector, useDispatch, Provider } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { fetchWishlist, addToWishlist, removeFromWishlist } from './action';
-import store from './store';
 
 export interface WishlistItem {
   id: number;
@@ -44,17 +43,17 @@ const ReduxWishlistContext = createContext<WishlistContextType | undefined>(unde
 
 export const ReduxWishlistProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <Provider store={store}>
-      <WishlistContextProvider>
-        {children}
-      </WishlistContextProvider>
-    </Provider>
+    <WishlistContextProvider>
+      {children}
+    </WishlistContextProvider>
   );
 };
 
 const WishlistContextProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
-  const { wishlist = [], loading = false, addingToWishlist = false, removingFromWishlist = false, error = null } = useSelector((state: WishlistState) => state) || { wishlist: [], loading: false, addingToWishlist: false, removingFromWishlist: false, error: null };
+  // Access global state.wishlist
+  const { wishlist = [], loading = false, addingToWishlist = false, removingFromWishlist = false, error = null } = useSelector((state: any) => state.wishlist) || { wishlist: [], loading: false, addingToWishlist: false, removingFromWishlist: false, error: null };
+
 
   useEffect(() => {
     // Fetch wishlist on mount if user is logged in

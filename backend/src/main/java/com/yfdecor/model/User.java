@@ -32,6 +32,8 @@ public class User  {
 	private String role; // e.g. USER, ADMIN
 
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
 	private Profile profile;
 
 

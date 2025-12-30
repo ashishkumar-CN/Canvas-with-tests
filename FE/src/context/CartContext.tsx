@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, ReactNode } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCart, addToCart, removeCartItem, updateCartItem, clearCart } from '@/redux/cart/action';
 
 export interface CartItem {
   id: string;
@@ -23,53 +25,43 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem('yf-cart');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const dispatch = useDispatch();
+  // Using 'any' for now as root state type is not strictly typed yet
+  const { items, totalItems, totalPrice } = useSelector((state: any) => state.cart);
 
   useEffect(() => {
-    localStorage.setItem('yf-cart', JSON.stringify(items));
-  }, [items]);
+    dispatch(fetchCart());
+  }, [dispatch]);
 
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
-    setItems(prev => {
-      const existing = prev.find(i => i.id === item.id);
-      if (existing) {
-        return prev.map(i => 
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prev, { ...item, quantity: 1 }];
-    });
-  };
-
-  const removeFromCart = (id: string) => {
-    setItems(prev => prev.filter(i => i.id !== id));
-  };
-
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(id);
-      return;
+  const handleAddToCart = async (item: Omit<CartItem, 'quantity'>) => {
+    try {
+      await dispatch(addToCart(item.id, 1) as any);
+      // Fetch updated cart to align state immediately (in case backend calculates things)
+      await dispatch(fetchCart() as any);
+    } catch (error) {
+      console.error("Failed to add to cart", error);
     }
-    setItems(prev => prev.map(i => 
-      i.id === id ? { ...i, quantity } : i
-    ));
   };
 
-  const clearCart = () => setItems([]);
+  const handleRemoveFromCart = (id: string) => {
+    dispatch(removeCartItem(id));
+  };
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const handleUpdateQuantity = (id: string, quantity: number) => {
+    dispatch(updateCartItem(id, quantity));
+  };
+
+  const handleClearCart = () => {
+    dispatch(clearCart());
+  };
 
   return (
     <CartContext.Provider value={{
       items,
-      addToCart,
-      removeFromCart,
-      updateQuantity,
-      clearCart,
+      addToCart: handleAddToCart,
+      removeFromCart: handleRemoveFromCart,
+      updateQuantity: handleUpdateQuantity,
+      clearCart: handleClearCart,
       totalItems,
       totalPrice
     }}>

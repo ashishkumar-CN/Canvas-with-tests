@@ -2,14 +2,23 @@ import { Link, useLocation } from 'react-router-dom';
 import { Search, Heart, ShoppingBag, Menu, Phone, ChevronDown, X, User } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { useState } from 'react';
-import { categories } from '@/data/products';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux'; // Import Redux hooks
+import { fetchCategories } from '@/redux/category/action'; // Import fetch action
 
 const Header = () => {
   const { totalItems } = useCart();
   const { user } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  // Fetch categories from Redux
+  const { categories, loading } = useSelector((state: any) => state.category);
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   const isHome = location.pathname === '/';
 
@@ -40,9 +49,10 @@ const Header = () => {
             </Link>
 
             {/* Desktop Navigation */}
+            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
-              <Link 
-                to="/shop/crystal-paintings" 
+              <Link
+                to="/shop/crystal-paintings"
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide"
               >
                 Crystal Paintings
@@ -54,8 +64,8 @@ const Header = () => {
                 </button>
                 <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                   <div className="bg-card rounded-lg shadow-lg border border-border p-4 min-w-[200px]">
-                    {categories.filter(c => c.slug === 'canvas-paintings').map(cat => (
-                      <Link 
+                    {categories.filter((c: any) => c.slug === 'canvas-paintings').map((cat: any) => (
+                      <Link
                         key={cat.id}
                         to={`/shop/${cat.slug}`}
                         className="block py-2 text-sm text-foreground hover:text-primary transition-colors"
@@ -63,18 +73,27 @@ const Header = () => {
                         {cat.name}
                       </Link>
                     ))}
+                    {/* Fallback if categories aren't loaded yet or if specific nested structure was desired */}
+                    {categories.length === 0 && (
+                      <Link
+                        to="/shop/canvas-paintings"
+                        className="block py-2 text-sm text-foreground hover:text-primary transition-colors"
+                      >
+                        Canvas Paintings
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
-              <Link 
-                to="/shop/wallpapers" 
+              <Link
+                to="/shop/wallpapers"
                 className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide"
               >
                 Wallpapers
                 <ChevronDown className="h-4 w-4" />
               </Link>
-              <Link 
-                to="/shop/gear-clocks" 
+              <Link
+                to="/shop/gear-clocks"
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide"
               >
                 Gear Clocks
@@ -84,7 +103,7 @@ const Header = () => {
             {/* Actions */}
             <div className="flex items-center gap-4">
               {user ? (
-                <Link 
+                <Link
                   to="/account"
                   className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
                 >
@@ -92,22 +111,22 @@ const Header = () => {
                   <span>MY ACCOUNT</span>
                 </Link>
               ) : (
-                <Link 
+                <Link
                   to="/login"
                   className="hidden md:block text-sm font-medium text-foreground hover:text-primary transition-colors"
                 >
                   LOGIN / REGISTER
                 </Link>
               )}
-              
+
               <button className="p-2 text-foreground hover:text-primary transition-colors">
                 <Search className="h-5 w-5" />
               </button>
-              
-              <Link to="/account" className="hidden sm:block p-2 text-foreground hover:text-primary transition-colors">
+
+              <Link to="/wishlist" className="hidden sm:block p-2 text-foreground hover:text-primary transition-colors">
                 <Heart className="h-5 w-5" />
               </Link>
-              
+
               <Link to="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors">
                 <ShoppingBag className="h-5 w-5" />
                 {totalItems > 0 && (
@@ -117,7 +136,7 @@ const Header = () => {
                 )}
               </Link>
 
-              <button 
+              <button
                 className="lg:hidden p-2 text-foreground"
                 onClick={() => setMobileMenuOpen(true)}
               >
@@ -140,8 +159,8 @@ const Header = () => {
               </button>
             </div>
             <nav className="flex flex-col gap-4">
-              {categories.map(cat => (
-                <Link 
+              {categories.map((cat: any) => (
+                <Link
                   key={cat.id}
                   to={`/shop/${cat.slug}`}
                   className="py-2 text-foreground hover:text-primary transition-colors font-medium"
@@ -151,24 +170,24 @@ const Header = () => {
                 </Link>
               ))}
               <hr className="border-border my-4" />
-              <Link 
-                to="/shop" 
+              <Link
+                to="/shop"
                 className="py-2 text-primary font-semibold"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 View All Products
               </Link>
               {user ? (
-                <Link 
-                  to="/account" 
+                <Link
+                  to="/account"
                   className="py-2 text-foreground hover:text-primary transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   My Account
                 </Link>
               ) : (
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   className="py-2 text-foreground hover:text-primary transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >

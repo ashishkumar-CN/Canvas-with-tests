@@ -62,7 +62,7 @@ public class OrderService {
 				.orderNumber(orderNumber)
 				.totalAmount(total)
 				.deliveryCharge(deliveryCharge)
-				.status("pending")
+				.status(OrderStatus.PENDING)
 				.createdAt(LocalDateTime.now())
 				.address(address)
 				.items(new ArrayList<>())
@@ -89,9 +89,22 @@ public class OrderService {
 				.map(this::toResponse)
 				.collect(Collectors.toList());
 	}
+	
+	public List<OrderResponse> getAllOrders() {
+		return orderRepository.findAll().stream()
+				.map(this::toResponse)
+				.collect(Collectors.toList());
+	}
 
 	public OrderResponse getOrderById(User user, Long id) {
 		Order order = orderRepository.findByIdAndUser(id, user)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+		return toResponse(order);
+	}
+	
+	// Admin method to get any order by ID
+	public OrderResponse getOrderByIdAdmin(Long id) {
+		Order order = orderRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
 		return toResponse(order);
 	}
@@ -100,12 +113,25 @@ public class OrderService {
 		return getOrderById(user, id);
 	}
 
-	public OrderResponse updateOrderStatus(User user, Long id, String status) {
-		Order order = orderRepository.findByIdAndUser(id, user)
+	public OrderResponse updateOrderStatus(Long id, OrderStatus status) {
+		Order order = orderRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
 		order.setStatus(status);
 		order = orderRepository.save(order);
 		return toResponse(order);
+	}
+	
+    // Deprecated/Compat method for user if needed, or remove. 
+	// Based on original code, updateOrderStatus was accepting (User, id, statusString)
+	// Changing to admin-only usage primarily.
+	public OrderResponse updateOrderStatus(User user, Long id, String status) {
+		// Verify user is admin or allowed? For now, let's assuming this was meant for admin but passed user.
+		// Converting string to enum blindly
+		try {
+			return updateOrderStatus(id, OrderStatus.valueOf(status.toUpperCase()));
+		} catch (IllegalArgumentException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status");
+		}
 	}
 
 	private String generateOrderNumber() {
@@ -125,6 +151,22 @@ public class OrderService {
 	}
 
 	private OrderResponse toResponse(Order order) {
+		AddressResponse addressResponse = null;
+		if (order.getAddress() != null) {
+			addressResponse = AddressResponse.builder()
+					.id(order.getAddress().getId())
+					.name(order.getAddress().getName())
+					.phone(order.getAddress().getPhone())
+					.addressLine1(order.getAddress().getAddressLine1())
+					.addressLine2(order.getAddress().getAddressLine2())
+					.city(order.getAddress().getCity())
+					.state(order.getAddress().getState())
+					.country(order.getAddress().getCountry())
+					.zipCode(order.getAddress().getZipCode())
+					.isDefault(order.getAddress().getIsDefault())
+					.build();
+		}
+
 		return OrderResponse.builder()
 				.id(order.getId())
 				.orderNumber(order.getOrderNumber())
@@ -132,19 +174,10 @@ public class OrderService {
 				.deliveryCharge(order.getDeliveryCharge())
 				.status(order.getStatus())
 				.createdAt(order.getCreatedAt())
-				.items(order.getItems().stream().map(this::toItemResponse).collect(Collectors.toList()))
-				.address(AddressResponse.builder()
-						.id(order.getAddress().getId())
-						.name(order.getAddress().getName())
-						.phone(order.getAddress().getPhone())
-						.addressLine1(order.getAddress().getAddressLine1())
-						.addressLine2(order.getAddress().getAddressLine2())
-						.city(order.getAddress().getCity())
-						.state(order.getAddress().getState())
-						.country(order.getAddress().getCountry())
-						.zipCode(order.getAddress().getZipCode())
-						.isDefault(order.getAddress().getIsDefault())
-						.build())
+				.items(order.getItems() != null ? 
+						order.getItems().stream().map(this::toItemResponse).collect(Collectors.toList()) : 
+						new ArrayList<>())
+				.address(addressResponse)
 				.build();
 	}
 

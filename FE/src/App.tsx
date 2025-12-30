@@ -18,6 +18,7 @@ import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 import CategoryProducts from "./pages/CategoryProducts";
 import Wishlist from "./pages/Wishlist";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -30,22 +31,21 @@ const App = () => (
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <BrowserRouter>
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/shop/:category" element={<Shop />} />
-                  <Route path="/shop/:slug" element={<CategoryProducts />} />
-
+                  <Route path="/category/:slug" element={<CategoryProducts />} />
                   <Route path="/wishlist" element={<Wishlist />} />
                   <Route path="/cart" element={<Cart />} />
-
                   <Route path="/product/:id" element={<ProductDetail />} />
                   <Route path="/login" element={<Auth />} />
                   <Route path="/account" element={<Account />} />
                   <Route path="/checkout" element={<Checkout />} />
-
-                  {/* MUST ALWAYS BE LAST */}
+                  <Route path="/orders" element={<Account />} /> {/* Redirecting orders to Account for now */}
+                  <Route path="/blog" element={<NotFound />} /> {/* Placeholder/404 for Blog */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>

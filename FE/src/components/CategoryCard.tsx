@@ -1,28 +1,30 @@
-import { Link } from 'react-router-dom';
-import { Category } from '@/data/products';
+// CategoryCard.tsx
+import { Link } from "react-router-dom";
 
-interface CategoryCardProps {
+type Category = {
+  id: number;
+  name: string;
+  slug: string;
+  image: string;
+};
+
+type Props = {
   category: Category;
-  variant?: 'small' | 'large';
-}
+};
 
-const CategoryCard = ({ category, variant = 'small' }: CategoryCardProps) => {
-  const heightClass = variant === 'large' ? 'h-48' : 'h-28';
-
+const CategoryCard = ({ category }: Props) => {
   return (
-    <Link to={`/category/${category.slug}`} className="block group">
-      <div className={`relative overflow-hidden rounded-lg bg-card border border-border ${heightClass}`}>
+    <Link to={`/category/${category.slug}`}>
+      <div className="relative rounded-lg overflow-hidden cursor-pointer group">
         <img
           src={category.image}
           alt={category.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
         />
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-          <div>
-            <h3 className="text-white font-semibold text-sm md:text-base">{category.name}</h3>
-            <p className="text-white/80 text-xs">{category.productCount} items</p>
-          </div>
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <h3 className="text-white text-lg font-semibold">
+            {category.name}
+          </h3>
         </div>
       </div>
     </Link>
@@ -30,3 +32,5 @@ const CategoryCard = ({ category, variant = 'small' }: CategoryCardProps) => {
 };
 
 export default CategoryCard;
+
+

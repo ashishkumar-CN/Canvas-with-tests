@@ -17,7 +17,7 @@ public class OrderResponse {
 	private String orderNumber;
 	private Double totalAmount;
 	private Double deliveryCharge;
-	private String status;
+	private com.yfdecor.model.OrderStatus status;
 	private LocalDateTime createdAt;
 	private List<OrderItemResponse> items;
 	private AddressResponse address;

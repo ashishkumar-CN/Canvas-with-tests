@@ -1,14 +1,17 @@
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Layout from '@/components/Layout';
 import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/button';
 import { Minus, Plus, Trash2, ShoppingBag, ChevronRight } from 'lucide-react';
+import { toast } from 'sonner';
 import CategoryCard from '@/components/CategoryCard';
 import { categories } from '@/data/products';
+import CheckoutStepper from '@/components/CheckoutStepper';
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
+  const navigate = useNavigate();
 
   return (
     <Layout>
@@ -18,32 +21,7 @@ const Cart = () => {
       </Helmet>
 
       {/* Cart Steps */}
-      <section className="bg-secondary py-8 border-b border-border">
-        <div className="container">
-          <div className="flex items-center justify-center gap-4 md:gap-8 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                1
-              </span>
-              <span className="hidden sm:inline text-foreground font-semibold">SHOPPING CART</span>
-            </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold">
-                2
-              </span>
-              <span className="hidden sm:inline text-muted-foreground">CHECKOUT DETAILS</span>
-            </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold">
-                3
-              </span>
-              <span className="hidden sm:inline text-muted-foreground">ORDER COMPLETE</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <CheckoutStepper activeStep={1} />
 
       <section className="py-12 bg-background min-h-[60vh]">
         <div className="container">
@@ -122,14 +100,26 @@ const Cart = () => {
               {/* Summary */}
               <div>
                 <div className="bg-card border border-border p-6 sticky top-24">
-                  <h3 className="text-xl font-semibold mb-4">Cart Summary</h3>
-                  <div className="flex justify-between mb-4">
-                    <span>Total</span>
-                    <span className="font-bold">₹{totalPrice.toLocaleString()}</span>
+                  <div className="flex justify-between mb-4 font-display">
+                    <span className="text-muted-foreground uppercase tracking-widest text-xs font-bold">Estimated Total</span>
+                    <span className="font-bold text-xl text-primary">₹{totalPrice.toLocaleString()}</span>
                   </div>
-                  <Link to="/checkout">
-                    <Button className="w-full btn-gold">Proceed to Checkout</Button>
-                  </Link>
+                  <Button
+                    className="w-full btn-gold py-6 text-lg rounded-xl font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+                    onClick={() => {
+                      const user = localStorage.getItem('user');
+                      if (!user) {
+                        toast.info("Please login to proceed to checkout", {
+                          description: "We need your details to deliver your luxury decor."
+                        });
+                        navigate('/login?redirect=checkout');
+                      } else {
+                        navigate('/checkout');
+                      }
+                    }}
+                  >
+                    Proceed to Checkout
+                  </Button>
                 </div>
               </div>
             </div>

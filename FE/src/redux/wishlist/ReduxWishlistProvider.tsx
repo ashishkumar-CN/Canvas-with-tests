@@ -51,13 +51,20 @@ export const ReduxWishlistProvider = ({ children }: { children: ReactNode }) => 
 
 const WishlistContextProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
-  // Access global state.wishlist
-  const { wishlist = [], loading = false, addingToWishlist = false, removingFromWishlist = false, error = null } = useSelector((state: any) => state.wishlist) || { wishlist: [], loading: false, addingToWishlist: false, removingFromWishlist: false, error: null };
+  // Access global state.wishlist with safety
+  const wishlistState = useSelector((state: any) => state.wishlist) || {};
+  const {
+    wishlist = [],
+    loading = false,
+    addingToWishlist = false,
+    removingFromWishlist = false,
+    error = null
+  } = wishlistState;
 
 
   useEffect(() => {
     // Fetch wishlist on mount if user is logged in
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('jwt');
     if (token) {
       dispatch(fetchWishlist());
     }
@@ -94,7 +101,16 @@ const WishlistContextProvider = ({ children }: { children: ReactNode }) => {
 export const useReduxWishlist = () => {
   const context = useContext(ReduxWishlistContext);
   if (!context) {
-    throw new Error('useReduxWishlist must be used within ReduxWishlistProvider');
+    return {
+      wishlist: [],
+      loading: false,
+      addingToWishlist: false,
+      removingFromWishlist: false,
+      error: null,
+      fetchWishlist: () => { },
+      addToWishlist: () => { },
+      removeFromWishlist: () => { }
+    } as WishlistContextType;
   }
   return context;
 };

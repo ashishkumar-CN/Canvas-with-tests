@@ -7,14 +7,14 @@ import { useDispatch, useSelector } from 'react-redux'; // Import Redux hooks
 import { fetchCategories } from '@/redux/category/action'; // Import fetch action
 
 const Header = () => {
-  const { totalItems } = useCart();
+  const { totalItems, setDrawerOpen } = useCart();
   const { user } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dispatch = useDispatch();
 
-  // Fetch categories from Redux
-  const { categories, loading } = useSelector((state: any) => state.category);
+  // Fetch categories from Redux with safety fallback
+  const { categories = [], loading = false } = useSelector((state: any) => state.category || { categories: [] });
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -52,6 +52,12 @@ const Header = () => {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
               <Link
+                to="/shop"
+                className="text-sm font-semibold text-primary hover:text-gold-light transition-colors uppercase tracking-widest"
+              >
+                Shop
+              </Link>
+              <Link
                 to="/shop/crystal-paintings"
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors uppercase tracking-wide"
               >
@@ -64,7 +70,7 @@ const Header = () => {
                 </button>
                 <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                   <div className="bg-card rounded-lg shadow-lg border border-border p-4 min-w-[200px]">
-                    {categories.filter((c: any) => c.slug === 'canvas-paintings').map((cat: any) => (
+                    {Array.isArray(categories) && categories.filter((c: any) => c.slug === 'canvas-paintings').map((cat: any) => (
                       <Link
                         key={cat.id}
                         to={`/shop/${cat.slug}`}
@@ -74,7 +80,7 @@ const Header = () => {
                       </Link>
                     ))}
                     {/* Fallback if categories aren't loaded yet or if specific nested structure was desired */}
-                    {categories.length === 0 && (
+                    {(!Array.isArray(categories) || categories.length === 0) && (
                       <Link
                         to="/shop/canvas-paintings"
                         className="block py-2 text-sm text-foreground hover:text-primary transition-colors"
@@ -103,13 +109,23 @@ const Header = () => {
             {/* Actions */}
             <div className="flex items-center gap-4">
               {user ? (
-                <Link
-                  to="/account"
-                  className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
-                >
-                  <User className="h-5 w-5" />
-                  <span>MY ACCOUNT</span>
-                </Link>
+                <div className="flex items-center gap-4">
+                  {(user.role === 'ADMIN' || user.role === 'ROLE_ADMIN' || user.id === 1) && (
+                    <Link
+                      to="/admin/dashboard"
+                      className="hidden xl:flex items-center gap-2 text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary hover:text-primary-foreground transition-all"
+                    >
+                      ADMIN PANEL
+                    </Link>
+                  )}
+                  <Link
+                    to="/account"
+                    className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+                  >
+                    <User className="h-5 w-5" />
+                    <span>MY ACCOUNT</span>
+                  </Link>
+                </div>
               ) : (
                 <Link
                   to="/login"
@@ -127,10 +143,17 @@ const Header = () => {
                 <Heart className="h-5 w-5" />
               </Link>
 
-              <Link to="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors">
+              <Link
+                to="/cart"
+                className="relative p-2 text-foreground hover:text-primary transition-colors"
+                aria-label="Shopping cart"
+              >
                 <ShoppingBag className="h-5 w-5" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  <span
+                    key={totalItems}
+                    className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pop"
+                  >
                     {totalItems}
                   </span>
                 )}
@@ -159,7 +182,7 @@ const Header = () => {
               </button>
             </div>
             <nav className="flex flex-col gap-4">
-              {categories.map((cat: any) => (
+              {Array.isArray(categories) && categories.map((cat: any) => (
                 <Link
                   key={cat.id}
                   to={`/shop/${cat.slug}`}
@@ -172,11 +195,20 @@ const Header = () => {
               <hr className="border-border my-4" />
               <Link
                 to="/shop"
-                className="py-2 text-primary font-semibold"
+                className="py-2 text-primary font-bold uppercase tracking-widest text-sm"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 View All Products
               </Link>
+              {(user?.role === 'ADMIN' || user?.role === 'ROLE_ADMIN' || user?.id === 1) && (
+                <Link
+                  to="/admin/dashboard"
+                  className="py-2 text-primary font-bold uppercase tracking-widest text-sm"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
+              )}
               {user ? (
                 <Link
                   to="/account"

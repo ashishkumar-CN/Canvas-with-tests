@@ -26,22 +26,20 @@ import {
 export const fetchCart = () => async (dispatch) => {
   dispatch({ type: FETCH_CART_REQUEST });
   try {
-    // userId is not needed in URL if token is present, but backend requires it.
-    // We assume backend handles security via token, but path still needs ID.
-    // For now, let's keep using getUserId() helper or update backend to use Principal.
-    // The previous code had getUserId(). Let's keep it but use api instance.
     const userStr = localStorage.getItem('user');
     const userId = userStr ? JSON.parse(userStr).id : null;
 
     if (!userId) {
-      console.warn("User not logged in, skipping cart fetch");
-      dispatch({ type: FETCH_CART_FAILURE, payload: "User not logged in" });
+      // Load from Local Storage for Guest
+      const localCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+      dispatch({ type: FETCH_CART_SUCCESS, payload: localCart });
       return;
     }
 
     const response = await api.get(`/cart/${userId}`);
     const cartItems = response.data.map(item => ({
       id: item.id.toString(),
+      productId: item.product.id, // Keeping track of original product ID
       name: item.product.name,
       price: item.product.price - (item.product.discount || 0),
       originalPrice: item.product.discount ? item.product.price : undefined,
@@ -55,23 +53,46 @@ export const fetchCart = () => async (dispatch) => {
   }
 };
 
-export const addToCart = (productId, quantity = 1) => async (dispatch) => {
+export const addToCart = (product, quantity = 1) => async (dispatch) => {
   dispatch({ type: ADD_TO_CART_REQUEST });
   try {
     const userStr = localStorage.getItem('user');
     const userId = userStr ? JSON.parse(userStr).id : null;
 
     if (!userId) {
-      throw new Error("Please login to add items to cart");
+      // Guest Cart Logic
+      const cartItem = {
+        id: `guest_${product.id}`,
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.image,
+        quantity: quantity,
+        category: product.category || 'General'
+      };
+
+      const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+      const existing = guestCart.find(i => i.productId === product.id);
+      let updated;
+      if (existing) {
+        updated = guestCart.map(i => i.productId === product.id ? { ...i, quantity: i.quantity + quantity } : i);
+      } else {
+        updated = [...guestCart, cartItem];
+      }
+      localStorage.setItem('guestCart', JSON.stringify(updated));
+      dispatch({ type: ADD_TO_CART_SUCCESS, payload: existing ? { ...existing, quantity: existing.quantity + quantity } : cartItem });
+      return;
     }
 
     const response = await api.post(`/cart/${userId}`, {
-      productId,
+      productId: product.id,
       quantity
     });
     const item = response.data;
     const cartItem = {
       id: item.id.toString(),
+      productId: item.product.id,
       name: item.product.name,
       price: item.product.price - (item.product.discount || 0),
       originalPrice: item.product.discount ? item.product.price : undefined,
@@ -88,13 +109,26 @@ export const addToCart = (productId, quantity = 1) => async (dispatch) => {
 export const updateCartItem = (cartItemId, quantity) => async (dispatch) => {
   dispatch({ type: UPDATE_CART_ITEM_REQUEST });
   try {
-    const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
+    const userStr = localStorage.getItem('user');
+    const userId = userStr ? JSON.parse(userStr).id : null;
+
+    if (!userId) {
+      // Guest Update
+      const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+      const updated = guestCart.map(i => i.id === cartItemId ? { ...i, quantity } : i);
+      localStorage.setItem('guestCart', JSON.stringify(updated));
+      const item = updated.find(i => i.id === cartItemId);
+      dispatch({ type: UPDATE_CART_ITEM_SUCCESS, payload: { id: cartItemId, cartItem: item } });
+      return;
+    }
+
     const response = await api.put(`/cart/${userId}/${cartItemId}`, {
       quantity
     });
     const item = response.data;
     const cartItem = {
       id: item.id.toString(),
+      productId: item.product.id,
       name: item.product.name,
       price: item.product.price - (item.product.discount || 0),
       originalPrice: item.product.discount ? item.product.price : undefined,
@@ -111,7 +145,18 @@ export const updateCartItem = (cartItemId, quantity) => async (dispatch) => {
 export const removeCartItem = (cartItemId) => async (dispatch) => {
   dispatch({ type: REMOVE_CART_ITEM_REQUEST });
   try {
-    const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
+    const userStr = localStorage.getItem('user');
+    const userId = userStr ? JSON.parse(userStr).id : null;
+
+    if (!userId) {
+      // Guest Remove
+      const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+      const filtered = guestCart.filter(i => i.id !== cartItemId);
+      localStorage.setItem('guestCart', JSON.stringify(filtered));
+      dispatch({ type: REMOVE_CART_ITEM_SUCCESS, payload: cartItemId });
+      return;
+    }
+
     await api.delete(`/cart/${userId}/${cartItemId}`);
     dispatch({ type: REMOVE_CART_ITEM_SUCCESS, payload: cartItemId.toString() });
   } catch (error) {
@@ -122,7 +167,15 @@ export const removeCartItem = (cartItemId) => async (dispatch) => {
 export const clearCart = () => async (dispatch) => {
   dispatch({ type: CLEAR_CART_REQUEST });
   try {
-    const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
+    const userStr = localStorage.getItem('user');
+    const userId = userStr ? JSON.parse(userStr).id : null;
+
+    if (!userId) {
+      localStorage.removeItem('guestCart');
+      dispatch({ type: CLEAR_CART_SUCCESS });
+      return;
+    }
+
     await api.delete(`/cart/${userId}`);
     dispatch({ type: CLEAR_CART_SUCCESS });
   } catch (error) {

@@ -19,7 +19,18 @@ export const fetchProducts = (params) => async (dispatch) => {
         if (limit) queryParams.append('limit', limit);
 
         const response = await api.get(`/products?${queryParams.toString()}`);
-        dispatch({ type: FETCH_PRODUCTS_SUCCESS, payload: response.data });
+
+        // Map backend products to frontend format
+        const mappedProducts = (response.data || []).map(p => ({
+            ...p,
+            id: p.id.toString(),
+            image: p.imageUrl || p.image,
+            category: typeof p.category === 'object' ? p.category.name : (p.category || 'General'),
+            price: p.price || 0,
+            rating: p.rating || 4.5
+        }));
+
+        dispatch({ type: FETCH_PRODUCTS_SUCCESS, payload: mappedProducts });
     } catch (error) {
         dispatch({ type: FETCH_PRODUCTS_FAILURE, payload: error.message });
     }
@@ -29,7 +40,16 @@ export const fetchProductById = (id) => async (dispatch) => {
     dispatch({ type: FETCH_PRODUCT_BY_ID_REQUEST });
     try {
         const response = await api.get(`/products/${id}`);
-        dispatch({ type: FETCH_PRODUCT_BY_ID_SUCCESS, payload: response.data });
+        const p = response.data;
+        const mappedProduct = {
+            ...p,
+            id: p.id.toString(),
+            image: p.imageUrl || p.image,
+            category: typeof p.category === 'object' ? p.category.name : (p.category || 'General'),
+            price: p.price || 0,
+            rating: p.rating || 4.5
+        };
+        dispatch({ type: FETCH_PRODUCT_BY_ID_SUCCESS, payload: mappedProduct });
     } catch (error) {
         dispatch({ type: FETCH_PRODUCT_BY_ID_FAILURE, payload: error.message });
     }

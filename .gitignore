@@ -1,0 +1,27 @@
+# Environment Files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build Artifacts
+target/
+dist/
+build/
+bin/
+node_modules/
+
+# IDE Configurations
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

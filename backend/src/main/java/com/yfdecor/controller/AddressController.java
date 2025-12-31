@@ -17,22 +17,22 @@ import java.util.List;
 public class AddressController {
 	private final AddressService addressService;
 
-	@GetMapping
-	public ResponseEntity<List<AddressResponse>> getAddresses(@AuthenticationPrincipal User user) {
-		List<AddressResponse> addresses = addressService.getAddresses(user);
+	@GetMapping("/user/{userId}")
+	public ResponseEntity<List<AddressResponse>> getAddresses(@PathVariable Long userId) {
+		List<AddressResponse> addresses = addressService.getAddressesByUserId(userId);
 		return ResponseEntity.ok(addresses);
 	}
 
 	@PostMapping
 	public ResponseEntity<AddressResponse> addAddress(@AuthenticationPrincipal User user,
-			@RequestBody AddressRequest request) {
+            @RequestBody AddressRequest request) {
 		AddressResponse response = addressService.addAddress(user, request);
 		return ResponseEntity.ok(response);
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<AddressResponse> updateAddress(@AuthenticationPrincipal User user,
-			@PathVariable Long id,
+            @PathVariable Long id,
 			@RequestBody AddressRequest request) {
 		AddressResponse response = addressService.updateAddress(user, id, request);
 		return ResponseEntity.ok(response);
@@ -40,7 +40,7 @@ public class AddressController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteAddress(@AuthenticationPrincipal User user,
-			@PathVariable Long id) {
+            @PathVariable Long id) {
 		addressService.deleteAddress(user, id);
 		return ResponseEntity.noContent().build();
 	}

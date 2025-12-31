@@ -1,4 +1,3 @@
-
 package com.yfdecor.service;
 
 import com.yfdecor.dto.request.OrderRequest;
@@ -84,8 +83,8 @@ public class OrderService {
 		return toResponse(order);
 	}
 
-	public List<OrderResponse> getOrders(User user) {
-		return orderRepository.findByUser(user).stream()
+	public List<OrderResponse> getOrdersByUserId(Long userId) {
+		return orderRepository.findByUserId(userId).stream()
 				.map(this::toResponse)
 				.collect(Collectors.toList());
 	}
@@ -96,8 +95,8 @@ public class OrderService {
 				.collect(Collectors.toList());
 	}
 
-	public OrderResponse getOrderById(User user, Long id) {
-		Order order = orderRepository.findByIdAndUser(id, user)
+	public OrderResponse getOrderByIdAndUser(Long userId, Long id) {
+		Order order = orderRepository.findByIdAndUserId(id, userId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
 		return toResponse(order);
 	}
@@ -109,10 +108,6 @@ public class OrderService {
 		return toResponse(order);
 	}
 
-	public OrderResponse getOrder(User user, Long id) {
-		return getOrderById(user, id);
-	}
-
 	public OrderResponse updateOrderStatus(Long id, OrderStatus status) {
 		Order order = orderRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
@@ -121,12 +116,7 @@ public class OrderService {
 		return toResponse(order);
 	}
 	
-    // Deprecated/Compat method for user if needed, or remove. 
-	// Based on original code, updateOrderStatus was accepting (User, id, statusString)
-	// Changing to admin-only usage primarily.
 	public OrderResponse updateOrderStatus(User user, Long id, String status) {
-		// Verify user is admin or allowed? For now, let's assuming this was meant for admin but passed user.
-		// Converting string to enum blindly
 		try {
 			return updateOrderStatus(id, OrderStatus.valueOf(status.toUpperCase()));
 		} catch (IllegalArgumentException e) {

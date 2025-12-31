@@ -1,4 +1,3 @@
-
 package com.yfdecor.dto.response;
 
 import lombok.AllArgsConstructor;
@@ -12,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AuthResponse {
 	private UserResponse user;
+    private String jwt;
 }

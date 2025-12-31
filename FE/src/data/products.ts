@@ -226,6 +226,138 @@ export const products: Product[] = [
     description: 'Royal peacock artwork.',
     rating: 4.8,
     inStock: true
+  },
+  {
+    id: 'p14',
+    name: 'Abstract Sunset Canvas',
+    price: 2699,
+    originalPrice: 4799,
+    image: abstractArt,
+    category: 'Canvas Paintings',
+    categorySlug: 'canvas-paintings',
+    description: 'A vibrant abstract representation of a sunset.',
+    rating: 4.7,
+    inStock: true
+  },
+  {
+    id: 'p15',
+    name: 'Crystal Floral Vase',
+    price: 3899,
+    originalPrice: 6299,
+    image: crystalButterfly,
+    category: 'Crystal Glass Paintings',
+    categorySlug: 'crystal-paintings',
+    description: 'Breathtaking crystal glass art with delicate floral details.',
+    rating: 5.0,
+    inStock: true
+  },
+  {
+    id: 'p16',
+    name: 'Steampunk Chronometer',
+    price: 5299,
+    originalPrice: 8499,
+    image: gearClock,
+    category: 'Moving Gear Clocks',
+    categorySlug: 'gear-clocks',
+    description: 'Precision engineered moving gear clock with exposed mechanics.',
+    rating: 4.9,
+    inStock: true
+  },
+  {
+    id: 'p17',
+    name: 'Emerald Forest Wallpaper',
+    price: 1599,
+    originalPrice: 2899,
+    image: tropicalWallpaper,
+    category: 'Premium Wallpapers',
+    categorySlug: 'wallpapers',
+    description: 'Deep emerald tones to bring the forest into your living room.',
+    rating: 4.8,
+    inStock: true
+  },
+  {
+    id: 'p18',
+    name: 'Geometric Gold Canvas',
+    price: 3199,
+    originalPrice: 5599,
+    image: abstractArt,
+    category: 'Canvas Paintings',
+    categorySlug: 'canvas-paintings',
+    description: 'Modern geometric patterns with gold leaf accents.',
+    rating: 4.6,
+    inStock: true
+  },
+  {
+    id: 'p19',
+    name: 'Silver Peacock Crystal',
+    price: 4299,
+    originalPrice: 7299,
+    image: peacockArt,
+    category: 'Crystal Glass Paintings',
+    categorySlug: 'crystal-paintings',
+    description: 'Exquisite silver-etched peacock in premium crystal glass.',
+    rating: 4.9,
+    inStock: true
+  },
+  {
+    id: 'p20',
+    name: 'Astronomical Gear Clock',
+    price: 5999,
+    originalPrice: 9499,
+    image: modernClock,
+    category: 'Moving Gear Clocks',
+    categorySlug: 'gear-clocks',
+    description: 'Celestial themed gear clock showing planetary alignments.',
+    rating: 5.0,
+    inStock: true
+  },
+  {
+    id: 'p21',
+    name: 'Midnight Bloom Wallpaper',
+    price: 1799,
+    originalPrice: 3199,
+    image: floralWallpaper,
+    category: 'Premium Wallpapers',
+    categorySlug: 'wallpapers',
+    description: 'Dark, sophisticated floral patterns for a luxury bedroom.',
+    rating: 4.7,
+    inStock: true
+  },
+  {
+    id: 'p22',
+    name: 'Tibetan Monk Canvas',
+    price: 2899,
+    originalPrice: 5199,
+    image: canvasBuddha,
+    category: 'Canvas Paintings',
+    categorySlug: 'canvas-paintings',
+    description: 'Spiritual artwork depicting the journey of a Tibetan monk.',
+    rating: 4.8,
+    inStock: true
+  },
+  {
+    id: 'p23',
+    name: 'Radiant Sun Mandala',
+    price: 2999,
+    originalPrice: 5399,
+    image: mandala,
+    category: 'Canvas Paintings',
+    categorySlug: 'canvas-paintings',
+    description: 'Intricate sun mandala for positive energy.',
+    rating: 4.9,
+    inStock: true
+  },
+  {
+    id: 'p24',
+    name: 'Gilded Lotus Wall-Art',
+    price: 1899,
+    originalPrice: 3499,
+    image: lotus,
+    category: 'Premium Wallpapers',
+    categorySlug: 'wallpapers',
+    description: 'Large scale lotus print with gold metallic highlights.',
+    rating: 4.6,
+    inStock: true
   }
 ];
 

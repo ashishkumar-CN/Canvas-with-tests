@@ -22,6 +22,7 @@ export const fetchAddresses = () => async (dispatch) => {
     dispatch({ type: FETCH_ADDRESSES_SUCCESS, payload: response.data });
   } catch (error) {
     dispatch({ type: FETCH_ADDRESSES_FAILURE, payload: error.message });
+    throw error;
   }
 };
 
@@ -33,6 +34,7 @@ export const addAddress = (addressData) => async (dispatch) => {
     return response.data;
   } catch (error) {
     dispatch({ type: ADD_ADDRESS_FAILURE, payload: error.message });
+    throw error;
   }
 };
 

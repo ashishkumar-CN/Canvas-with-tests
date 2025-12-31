@@ -1,5 +1,6 @@
 package com.yfdecor.service;
 
+import com.yfdecor.config.JwtProvider;
 import com.yfdecor.dto.request.AuthRequest;
 import com.yfdecor.dto.request.RegisterRequest;
 import com.yfdecor.dto.response.AuthResponse;
@@ -11,6 +12,9 @@ import com.yfdecor.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,6 +26,7 @@ public class AuthService {
 	private final UserRepository userRepository;
 	private final ProfileRepository profileRepository;
 	private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
 	@Transactional
 	public AuthResponse register(RegisterRequest request) {
@@ -44,7 +49,11 @@ public class AuthService {
 				.build();
 		profileRepository.save(profile);
 
-		return buildResponse(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtProvider.generateToken(authentication);
+
+		return buildResponse(user, jwt);
 	}
 
 	public AuthResponse login(AuthRequest request) {
@@ -58,7 +67,11 @@ public class AuthService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
 		}
 
-		return buildResponse(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtProvider.generateToken(authentication);
+
+		return buildResponse(user, jwt);
 	}
 
 	public UserResponse getMe(String email) {
@@ -76,7 +89,7 @@ public class AuthService {
 				.build();
 	}
 
-	private AuthResponse buildResponse(User user) {
+	private AuthResponse buildResponse(User user, String jwt) {
 		return AuthResponse.builder()
 				.user(UserResponse.builder()
 						.id(user.getId())
@@ -84,6 +97,7 @@ public class AuthService {
 						.name(user.getName())
 						.role(user.getRole())
 						.build())
+                .jwt(jwt)
 				.build();
 	}
 

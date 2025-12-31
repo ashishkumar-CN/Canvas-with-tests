@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 
 const AdminDashboard = () => {
     const dispatch = useDispatch();
-    const { orders, carts, loading } = useSelector((state: any) => state.admin);
+    const { orders = [], carts = [], loading } = useSelector((state: any) => state.admin);
     const [statusFilter, setStatusFilter] = useState('ALL');
 
     useEffect(() => {
@@ -40,6 +40,18 @@ const AdminDashboard = () => {
             toast.error("Failed to update status");
         }
     };
+
+    // Calculate Metrics
+    const totalRevenue = orders.reduce((acc: number, order: any) => {
+        if (['CONFIRMED', 'SHIPPED', 'DELIVERED'].includes(order.status)) {
+            return acc + (order.totalAmount || 0) + (order.deliveryCharge || 0);
+        }
+        return acc;
+    }, 0);
+
+    const pendingOrders = orders.filter((o: any) => o.status === 'PENDING').length;
+    const totalOrders = orders.length;
+    const activeCartsCount = carts.length;
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -62,7 +74,73 @@ const AdminDashboard = () => {
 
     return (
         <div className="container mx-auto p-6 space-y-8">
-            <h1 className="text-3xl font-bold font-display tracking-tight">Admin Dashboard</h1>
+            <div className="flex flex-col gap-2">
+                <h1 className="text-4xl font-bold font-display tracking-tight text-foreground">Admin Dashboard</h1>
+                <p className="text-muted-foreground">Manage your store's orders and monitor active customer sessions.</p>
+            </div>
+
+            {/* Metrics Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="border-border/50 bg-card shadow-sm hover:shadow-md transition-all">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Total Revenue</p>
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                                <Package className="h-5 w-5 text-primary" />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <h3 className="text-3xl font-bold">₹{totalRevenue.toLocaleString()}</h3>
+                            <p className="text-xs text-green-500 font-medium">From successful orders</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-border/50 bg-card shadow-sm hover:shadow-md transition-all">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Total Orders</p>
+                            <div className="p-2 bg-blue-500/10 rounded-lg">
+                                <Package className="h-5 w-5 text-blue-500" />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <h3 className="text-3xl font-bold">{totalOrders}</h3>
+                            <p className="text-xs text-muted-foreground">Lifetime volume</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-border/50 bg-card shadow-sm hover:shadow-md transition-all">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Pending Tasks</p>
+                            <div className="p-2 bg-yellow-500/10 rounded-lg">
+                                <Loader2 className="h-5 w-5 text-yellow-500" />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <h3 className="text-3xl font-bold">{pendingOrders}</h3>
+                            <p className="text-xs text-yellow-600 font-medium">Orders needing confirmation</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-border/50 bg-card shadow-sm hover:shadow-md transition-all">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Active Carts</p>
+                            <div className="p-2 bg-purple-500/10 rounded-lg">
+                                <ShoppingCart className="h-5 w-5 text-purple-500" />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <h3 className="text-3xl font-bold">{activeCartsCount}</h3>
+                            <p className="text-xs text-muted-foreground">Potential sales in progress</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
 
             <Tabs defaultValue="orders" className="w-full">
                 <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">

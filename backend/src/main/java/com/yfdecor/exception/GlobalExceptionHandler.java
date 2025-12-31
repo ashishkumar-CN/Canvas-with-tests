@@ -34,8 +34,10 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
 		Map<String, Object> body = new HashMap<>();
-		body.put("error", "Internal server error");
+		body.put("error", "Internal server error: " + ex.getMessage());
+        body.put("type", ex.getClass().getName());
 		body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        ex.printStackTrace(); // Still print full stack to server logs
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
 	}
 }

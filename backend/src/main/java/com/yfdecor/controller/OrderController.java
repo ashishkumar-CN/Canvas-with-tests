@@ -19,29 +19,27 @@ public class OrderController {
 
     @PostMapping
 	public ResponseEntity<OrderResponse> placeOrder(@AuthenticationPrincipal User user,
-			@RequestBody OrderRequest request) {
+            @RequestBody OrderRequest request) {
 		OrderResponse response = orderService.placeOrder(user, request);
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping
-	public ResponseEntity<List<OrderResponse>> getOrderHistory(@AuthenticationPrincipal User user) {
-		List<OrderResponse> orders = orderService.getOrders(user);
+	@GetMapping("/user/{userId}")
+	public ResponseEntity<List<OrderResponse>> getOrderHistory(@PathVariable Long userId) {
+		List<OrderResponse> orders = orderService.getOrdersByUserId(userId);
 		return ResponseEntity.ok(orders);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<OrderResponse> getOrder(@AuthenticationPrincipal User user,
-			@PathVariable Long id) {
-		OrderResponse response = orderService.getOrder(user, id);
+	public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id) {
+		OrderResponse response = orderService.getOrderByIdAdmin(id);
 		return ResponseEntity.ok(response);
 	}
 
 	@PutMapping("/{id}/status")
-	public ResponseEntity<OrderResponse> updateOrderStatus(@AuthenticationPrincipal User user,
-			@PathVariable Long id,
+	public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Long id,
 			@RequestParam String status) {
-		OrderResponse response = orderService.updateOrderStatus(user, id, status);
+		OrderResponse response = orderService.updateOrderStatus(null, id, status);
 		return ResponseEntity.ok(response);
 	}
 }

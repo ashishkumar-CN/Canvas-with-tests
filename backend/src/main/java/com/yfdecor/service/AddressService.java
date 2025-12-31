@@ -1,4 +1,3 @@
-
 package com.yfdecor.service;
 
 import com.yfdecor.dto.request.AddressRequest;
@@ -6,6 +5,7 @@ import com.yfdecor.dto.response.AddressResponse;
 import com.yfdecor.model.Address;
 import com.yfdecor.model.User;
 import com.yfdecor.repository.AddressRepository;
+import com.yfdecor.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,8 +19,11 @@ import java.util.stream.Collectors;
 public class AddressService {
 
 	private final AddressRepository addressRepository;
+    private final UserRepository userRepository;
 
-	public List<AddressResponse> getAddresses(User user) {
+	public List<AddressResponse> getAddressesByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 		return addressRepository.findByUser(user).stream()
 				.map(this::toResponse)
 				.collect(Collectors.toList());
@@ -60,7 +63,9 @@ public class AddressService {
 	}
 
 	public void deleteAddress(User user, Long id) {
-		addressRepository.deleteByIdAndUser(id, user);
+        Address address = addressRepository.findByIdAndUser(id, user)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Address not found"));
+		addressRepository.delete(address);
 	}
 
 	private AddressResponse toResponse(Address address) {
@@ -78,6 +83,3 @@ public class AddressService {
 				.build();
 	}
 }
-
-
-

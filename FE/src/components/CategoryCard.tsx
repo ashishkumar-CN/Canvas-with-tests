@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 
 type Category = {
-  id: number;
+  id: string | number;
   name: string;
   slug: string;
   image: string;

@@ -1,9 +1,11 @@
+import React from 'react';
 import { useCart } from '@/context/CartContext';
 import { toast } from 'sonner';
-import { ShoppingCart, Zap } from 'lucide-react';
+import { ShoppingCart, Zap, CheckCircle2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const ProductDetail = () => {
   // ... imports and basic state ...
@@ -15,23 +17,21 @@ const ProductDetail = () => {
 
   // ... useEffect ...
 
+  const [isAdding, setIsAdding] = React.useState(false);
+
   const handleAddToCart = async () => {
     if (!product) return;
+    setIsAdding(true);
     await addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
-      originalPrice: product.discount ? product.price / (1 - product.discount / 100) : product.price,
-      image: product.image || product.imageUrl,
-      category: product.category?.name || 'Category'
+      originalPrice: product.discount > 0 ? product.price + product.discount : product.price,
+      image: product.imageUrl || product.image,
+      category: product.category?.name || 'General'
     });
-    toast.success("Added to Cart", {
-      description: `${product.name} has been added to your cart.`,
-      action: {
-        label: 'View Cart',
-        onClick: () => navigate('/cart')
-      }
-    });
+
+    setTimeout(() => setIsAdding(false), 2000);
   };
 
   const handleBuyNow = () => {
@@ -66,9 +66,26 @@ const ProductDetail = () => {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border">
-        <Button size="lg" className="btn-gold flex-1 gap-2" onClick={handleAddToCart}>
-          <ShoppingCart className="h-5 w-5" />
-          Add to Cart
+        <Button
+          size="lg"
+          disabled={isAdding}
+          className={cn(
+            "flex-1 gap-2 transition-all duration-300",
+            isAdding ? "bg-green-600 hover:bg-green-600 text-white" : "btn-gold border-0"
+          )}
+          onClick={handleAddToCart}
+        >
+          {isAdding ? (
+            <>
+              <CheckCircle2 className="h-5 w-5" />
+              Added to Cart!
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="h-5 w-5" />
+              Add to Cart
+            </>
+          )}
         </Button>
         <Button size="lg" variant="outline" className="flex-1 gap-2 border-primary text-primary hover:bg-primary/10" onClick={handleBuyNow}>
           <Zap className="h-5 w-5" />

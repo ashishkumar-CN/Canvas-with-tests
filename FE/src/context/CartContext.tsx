@@ -20,14 +20,16 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  isDrawerOpen: boolean;
+  setDrawerOpen: (open: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
-  // Using 'any' for now as root state type is not strictly typed yet
-  const { items, totalItems, totalPrice } = useSelector((state: any) => state.cart);
+  const { items = [], totalItems = 0, totalPrice = 0 } = useSelector((state: any) => state.cart || {});
+  const [isDrawerOpen, setDrawerOpen] = React.useState(false);
 
   useEffect(() => {
     dispatch(fetchCart());
@@ -35,9 +37,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const handleAddToCart = async (item: Omit<CartItem, 'quantity'>) => {
     try {
-      await dispatch(addToCart(item.id, 1) as any);
-      // Fetch updated cart to align state immediately (in case backend calculates things)
+      // Extract numeric ID for backend if it's a mock ID like 'p1'
+      const numericIdOnly = item.id.replace(/\D/g, '');
+      const productId = numericIdOnly ? parseInt(numericIdOnly, 10) : item.id;
+
+      // Pass the whole item object to the Redux action as expected
+      // but with the backend-ready numeric ID
+      await dispatch(addToCart({ ...item, id: productId }, 1) as any);
       await dispatch(fetchCart() as any);
+      setDrawerOpen(true);
     } catch (error) {
       console.error("Failed to add to cart", error);
     }
@@ -63,7 +71,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       updateQuantity: handleUpdateQuantity,
       clearCart: handleClearCart,
       totalItems,
-      totalPrice
+      totalPrice,
+      isDrawerOpen,
+      setDrawerOpen
     }}>
       {children}
     </CartContext.Provider>
@@ -73,7 +83,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error('useCart must be used within CartProvider');
+    return {
+      items: [],
+      addToCart: () => { },
+      removeFromCart: () => { },
+      updateQuantity: () => { },
+      clearCart: () => { },
+      totalItems: 0,
+      totalPrice: 0,
+      isDrawerOpen: false,
+      setDrawerOpen: () => { },
+    } as CartContextType;
   }
   return context;
 };

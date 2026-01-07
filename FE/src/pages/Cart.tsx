@@ -31,7 +31,7 @@ const Cart = () => {
                 <ShoppingBag className="h-16 w-16 text-muted-foreground" />
               </div>
               <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
-                Your cart is currently empty.
+                Your carttttttt is currently empty.
               </h2>
               <p className="text-muted-foreground mb-8">
                 Looks like you haven't added any items to your cart yet.

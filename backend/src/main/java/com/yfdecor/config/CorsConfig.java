@@ -16,7 +16,7 @@ public class CorsConfig {
 	public CorsFilter corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
-		config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080", "http://localhost:5173", "http://localhost", "http://canvas-frontend-prod.s3-website.eu-north-1.amazonaws.com")); // React dev server + S3
+		config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080", "http://localhost:5173", "http://localhost", "http://canvas-frontend-prod.s3-website.eu-north-1.amazonaws.com")); // React dev server + S3 , // first do the s3 to get hte link and configure in spring securty as well
 		config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
 		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 

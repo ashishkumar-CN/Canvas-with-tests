@@ -41,7 +41,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(
-                List.of("http://localhost:3000", "http://localhost:8080", "http://localhost:5173", "http://localhost:8081", "http://localhost:8082")
+                List.of("http://localhost:3000", "http://localhost:8080", "http://localhost:5173", "http://localhost:8081", "http://localhost:8082", "http://localhost", "http://canvas-frontend-prod.s3-website.eu-north-1.amazonaws.com")
         );
         configuration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
